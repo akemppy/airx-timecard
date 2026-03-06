@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c \":*)",
+      "Bash(python -c \":*)",
+      "Bash(node --version)",
+      "Bash(yes \"\")",
+      "Bash(npx create-next-app@latest temp-init --typescript --tailwind --eslint --app --src-dir=false --use-npm --no-import-alias --turbopack)",
+      "Bash(npx create-next-app@latest temp-init --typescript --tailwind --eslint --app --src-dir=false --use-npm --no-import-alias --yes)",
+      "Bash(npm install prisma @prisma/client @neondatabase/serverless openai @anthropic-ai/sdk mssql bcryptjs jsonwebtoken date-fns lucide-react next-pwa @vercel/blob)"
+    ]
+  }
+}
