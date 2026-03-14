@@ -60,7 +60,7 @@ export async function exportTimecardsCsv(filters: ExportFilters): Promise<string
   const rows = formattedEntries.map((e) =>
     [
       csvEscape(e.employeeName),
-      e.workDate instanceof Date ? e.workDate.toISOString().split("T")[0] : e.workDate.split("T")[0],
+      new Date(e.workDate).toISOString().split("T")[0],
       csvEscape(e.foundationJobId),
       csvEscape(e.jobName),
       `${e.costCode} ${e.costCodeDesc}`,

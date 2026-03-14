@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
           description: entry.task,
           quantity: entry.quantity || null,
           unit: entry.unit || null,
-          crewMembers: entry.crewMembers || [],
+          crewMembers: JSON.stringify(entry.crewMembers || []),
           notes: entry.notes || null,
           aiConfidence: entry.confidence,
           isFlagged: entry.confidence < 0.8,
