@@ -22,7 +22,10 @@ export default function DashboardPage() {
 
   useEffect(() => {
     fetch("/api/dashboard")
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error(`Dashboard API returned ${r.status}`);
+        return r.json();
+      })
       .then(setData)
       .catch(console.error)
       .finally(() => setLoading(false));
@@ -36,7 +39,12 @@ export default function DashboardPage() {
     );
   }
 
-  if (!data) return <div className="p-4">Failed to load dashboard</div>;
+  if (!data) return (
+    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
+      <p className="text-slate-600 mb-4">Dashboard is only available for PM and Admin roles.</p>
+      <Button onClick={() => router.push("/")} className="bg-[#1F3864]">Go to Timecard</Button>
+    </div>
+  );
 
   const statusColor: Record<string, string> = {
     submitted: "bg-blue-100 text-blue-800",

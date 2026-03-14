@@ -34,7 +34,6 @@ export default function RecordPage() {
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      setError("Speech Recognition not supported in this browser. Please use Chrome, Edge, or Safari.");
       return;
     }
     recognitionRef.current = new SpeechRecognition();
@@ -196,60 +195,89 @@ export default function RecordPage() {
             <div className="text-center space-y-2 mb-4">
               <h2 className="text-2xl font-bold text-slate-800">Record Your Day</h2>
               <p className="text-sm text-slate-600">
-                Hold the button and speak about your jobs, tasks, and hours
+                {recognitionRef.current
+                  ? "Hold the button and speak about your jobs, tasks, and hours"
+                  : "Type what you worked on today"}
               </p>
             </div>
 
-            <div className="flex flex-col items-center gap-8">
-              {/* Live transcript display */}
-              {isListening && (
-                <div className="w-full max-w-sm bg-blue-50 rounded-lg p-4 border border-blue-200 min-h-20">
-                  <p className="text-xs font-semibold text-blue-600 mb-2">LISTENING...</p>
-                  <p className="text-sm text-slate-700">
-                    {transcript}
-                    {interimTranscript && (
-                      <span className="italic text-slate-500 opacity-60">
-                        {interimTranscript}
-                      </span>
+            {recognitionRef.current ? (
+              <div className="flex flex-col items-center gap-8">
+                {/* Live transcript display */}
+                {isListening && (
+                  <div className="w-full max-w-sm bg-blue-50 rounded-lg p-4 border border-blue-200 min-h-20">
+                    <p className="text-xs font-semibold text-blue-600 mb-2">LISTENING...</p>
+                    <p className="text-sm text-slate-700">
+                      {transcript}
+                      {interimTranscript && (
+                        <span className="italic text-slate-500 opacity-60">
+                          {interimTranscript}
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                )}
+
+                {/* Record button */}
+                <button
+                  onMouseDown={startRecording}
+                  onMouseUp={stopRecording}
+                  onTouchStart={startRecording}
+                  onTouchEnd={stopRecording}
+                  className={`rounded-full w-32 h-32 flex items-center justify-center text-white font-bold shadow-lg transition-all active:scale-95 ${
+                    isRecording
+                      ? "bg-red-600 hover:bg-red-700 animate-pulse"
+                      : "bg-[#1F3864] hover:bg-[#2a4a80]"
+                  }`}
+                >
+                  <div className="flex flex-col items-center gap-2">
+                    {isRecording ? (
+                      <>
+                        <Square className="w-10 h-10 fill-white" />
+                        <span className="text-xs">RELEASE</span>
+                      </>
+                    ) : (
+                      <>
+                        <Mic className="w-12 h-12" />
+                        <span className="text-xs">HOLD</span>
+                      </>
                     )}
-                  </p>
-                </div>
-              )}
+                  </div>
+                </button>
 
-              {/* Record button */}
-              <button
-                onMouseDown={startRecording}
-                onMouseUp={stopRecording}
-                onTouchStart={startRecording}
-                onTouchEnd={stopRecording}
-                disabled={!recognitionRef.current}
-                className={`rounded-full w-32 h-32 flex items-center justify-center text-white font-bold shadow-lg transition-all active:scale-95 ${
-                  isRecording
-                    ? "bg-red-600 hover:bg-red-700 animate-pulse"
-                    : "bg-[#1F3864] hover:bg-[#2a4a80]"
-                }`}
-              >
-                <div className="flex flex-col items-center gap-2">
-                  {isRecording ? (
-                    <>
-                      <Square className="w-10 h-10 fill-white" />
-                      <span className="text-xs">RELEASE</span>
-                    </>
-                  ) : (
-                    <>
-                      <Mic className="w-12 h-12" />
-                      <span className="text-xs">HOLD</span>
-                    </>
-                  )}
-                </div>
-              </button>
+                <p className="text-xs text-slate-500 text-center max-w-xs px-4">
+                  {isListening
+                    ? "Release to finish recording"
+                    : "Hold the button and speak. Release when done."}
+                </p>
 
-              <p className="text-xs text-slate-500 text-center max-w-xs px-4">
-                {isListening
-                  ? "Release to finish recording"
-                  : "Hold the button and speak. Release when done."}
-              </p>
-            </div>
+                <button
+                  onClick={() => {
+                    setEditableTranscript("");
+                    setStep("editing");
+                  }}
+                  className="text-sm text-[#1F3864] underline"
+                >
+                  Or type it instead
+                </button>
+              </div>
+            ) : (
+              <div className="w-full max-w-sm space-y-4">
+                <textarea
+                  value={editableTranscript}
+                  onChange={(e) => setEditableTranscript(e.target.value)}
+                  placeholder="Example: Worked 4 hours on job 2401 doing ductwork, 3 hours on job 2402 doing piping"
+                  className="w-full h-40 p-3 border border-slate-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#1F3864]"
+                />
+                <button
+                  onClick={() => analyzeTranscript(editableTranscript)}
+                  disabled={!editableTranscript.trim()}
+                  className="w-full py-3 bg-[#1F3864] text-white rounded-lg font-semibold disabled:opacity-50"
+                >
+                  Analyze Timecard
+                </button>
+              </div>
+            )}
           </div>
         )}
 
